@@ -77,6 +77,33 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.6)
       public_suffix (>= 2.0.2, < 6.0)
+    async (2.10.2)
+      console (~> 1.10)
+      fiber-annotation
+      io-event (~> 1.5, >= 1.5.1)
+      timers (~> 4.1)
+    async-container (0.18.2)
+      async (~> 2.10)
+    async-http (0.65.1)
+      async (>= 2.10.2)
+      async-pool (>= 0.6.1)
+      io-endpoint (~> 0.10)
+      io-stream (~> 0.4)
+      protocol-http (~> 0.26.0)
+      protocol-http1 (~> 0.19.0)
+      protocol-http2 (~> 0.17.0)
+      traces (>= 0.10.0)
+    async-http-cache (0.4.3)
+      async-http (~> 0.56)
+    async-pool (0.6.1)
+      async (>= 1.25)
+    async-service (0.12.0)
+      async
+      async-container (~> 0.16)
+    async-websocket (0.26.1)
+      async-http (~> 0.54)
+      protocol-rack (~> 0.5)
+      protocol-websocket (~> 0.11)
     base64 (0.2.0)
     bigdecimal (3.1.7)
     bindex (0.8.1)
@@ -94,6 +121,14 @@ GEM
       xpath (~> 3.2)
     concurrent-ruby (1.2.3)
     connection_pool (2.4.1)
+    console (1.24.0)
+      fiber-annotation
+      fiber-local
+      json
+    console-adapter-rails (0.3.4)
+      console (~> 1.21)
+      fiber-storage (~> 0.1)
+      rails (>= 6.1)
     crass (1.0.6)
     date (3.3.4)
     debug (1.9.2)
@@ -101,6 +136,21 @@ GEM
       reline (>= 0.3.8)
     drb (2.2.1)
     erubi (1.12.0)
+    falcon (0.47.0)
+      async
+      async-container (~> 0.18)
+      async-http (~> 0.57)
+      async-http-cache (~> 0.4.0)
+      async-service (~> 0.10)
+      bundler
+      localhost (~> 1.1)
+      openssl (~> 3.0)
+      process-metrics (~> 0.2.0)
+      protocol-rack (~> 0.5)
+      samovar (~> 2.3)
+    fiber-annotation (0.2.0)
+    fiber-local (1.0.0)
+    fiber-storage (0.1.0)
     globalid (1.2.1)
       activesupport (>= 6.1)
     i18n (1.14.4)
@@ -110,12 +160,20 @@ GEM
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
     io-console (0.7.2)
+    io-endpoint (0.10.2)
+    io-event (1.5.1)
+    io-stream (0.4.0)
     irb (1.12.0)
       rdoc
       reline (>= 0.4.2)
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
+    json (2.7.2)
+    live (0.5.1)
+      async-websocket (~> 0.23)
+      trenni
+    localhost (1.3.1)
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -124,6 +182,7 @@ GEM
       net-imap
       net-pop
       net-smtp
+    mapping (1.1.1)
     marcel (1.0.4)
     matrix (0.4.2)
     mini_mime (1.1.5)
@@ -140,23 +199,27 @@ GEM
     net-smtp (0.5.0)
       net-protocol
     nio4r (2.7.1)
-    nokogiri (1.16.4-aarch64-linux)
-      racc (~> 1.4)
-    nokogiri (1.16.4-arm-linux)
-      racc (~> 1.4)
-    nokogiri (1.16.4-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.16.4-x86-linux)
-      racc (~> 1.4)
-    nokogiri (1.16.4-x86_64-darwin)
-      racc (~> 1.4)
     nokogiri (1.16.4-x86_64-linux)
       racc (~> 1.4)
+    openssl (3.2.0)
+    process-metrics (0.2.1)
+      console (~> 1.8)
+      samovar (~> 2.1)
+    protocol-hpack (1.4.3)
+    protocol-http (0.26.4)
+    protocol-http1 (0.19.1)
+      protocol-http (~> 0.22)
+    protocol-http2 (0.17.0)
+      protocol-hpack (~> 1.4)
+      protocol-http (~> 0.18)
+    protocol-rack (0.5.1)
+      protocol-http (~> 0.23)
+      rack (>= 1.0)
+    protocol-websocket (0.12.1)
+      protocol-http (~> 0.2)
     psych (5.1.2)
       stringio
     public_suffix (5.0.5)
-    puma (6.4.2)
-      nio4r (~> 2.0)
     racc (1.7.3)
     rack (3.0.10)
     rack-session (2.0.0)
@@ -207,6 +270,9 @@ GEM
       io-console (~> 0.5)
     rexml (3.2.6)
     rubyzip (2.3.2)
+    samovar (2.3.0)
+      console (~> 1.0)
+      mapping (~> 1.0)
     selenium-webdriver (4.19.0)
       base64 (~> 0.2)
       rexml (~> 3.2, >= 3.2.5)
@@ -219,17 +285,15 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
-    sqlite3 (1.7.3-aarch64-linux)
-    sqlite3 (1.7.3-arm-linux)
-    sqlite3 (1.7.3-arm64-darwin)
-    sqlite3 (1.7.3-x86-linux)
-    sqlite3 (1.7.3-x86_64-darwin)
     sqlite3 (1.7.3-x86_64-linux)
     stimulus-rails (1.3.3)
       railties (>= 6.0.0)
     stringio (3.1.0)
     thor (1.3.1)
     timeout (0.4.1)
+    timers (4.3.5)
+    traces (0.11.1)
+    trenni (3.14.0)
     turbo-rails (2.0.5)
       actionpack (>= 6.0.0)
       activejob (>= 6.0.0)
@@ -251,20 +315,18 @@ GEM
     zeitwerk (2.6.13)
 
 PLATFORMS
-  aarch64-linux
-  arm-linux
-  arm64-darwin
-  x86-linux
-  x86_64-darwin
   x86_64-linux
 
 DEPENDENCIES
+  async-websocket (~> 0.26.1)
   bootsnap
   capybara
+  console-adapter-rails (~> 0.3.4)
   debug
+  falcon (>= 0.47)
   importmap-rails
   jbuilder
-  puma (>= 5.0)
+  live (~> 0.5.0)
   rails (~> 7.1.3, >= 7.1.3.2)
   redis (>= 4.0.1)
   selenium-webdriver

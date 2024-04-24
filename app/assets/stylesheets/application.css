@@ -13,3 +13,259 @@
  *= require_tree .
  *= require_self
  */
+ 
+html {
+	font-family: "PT Sans", Verdana, Helvetica, Arial, sans-serif;
+	font-size: 16px;
+}
+
+pre {
+	tab-size: 2;
+}
+
+@media (min-width: 40em) {
+	html {
+		font-size: 18px;
+	}
+	
+	pre {
+		tab-size: 4;
+	}
+}
+
+@media (min-width: 80em) {
+	html {
+		font-size: 20px;
+	}
+	
+	pre {
+		tab-size: 4;
+	}
+}
+
+body {
+	padding: 0;
+	margin: 0;
+	
+	background-color: #fafafa;
+}
+
+nav {
+	font-size: 0.8rem;
+	text-align: right;
+	margin: 0.5rem;
+}
+
+main, footer {
+	max-width: 48rem;
+	padding: 1rem;
+	margin: auto;
+}
+
+body > header {
+	margin: 0.5rem 0;
+	
+	background: white;
+	
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+body > header img {
+	display: block;
+	margin: auto;
+	height: 6rem;
+}
+
+p, ul, ol {
+	color: #555;
+}
+
+p strong {
+	color: #222;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	margin: 2rem 1rem 1rem 1rem;
+	color: #54401d;
+}
+
+h1 {
+	margin: 4rem 0;
+}
+
+h2 {
+	margin-top: 6rem;
+}
+
+img {
+	border: none;
+}
+
+a, mark {
+	color: #2d8c46;
+}
+
+mark {
+	background-color: inherit;
+}
+
+a.action {
+	text-decoration: none;
+}
+
+a:hover {
+	color: #55c;
+}
+
+p, ul, ol, dl, h3 {
+	margin: 2rem;
+}
+
+li {
+	margin: 0.2rem;
+}
+
+li > ul, li > ol {
+	margin: 0;
+}
+
+pre {
+	overflow: auto;
+	
+	padding: 1rem 2rem;
+	font-size: 0.8rem;
+	
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	
+	background-color: #eee;
+}
+
+h3 {
+	border-bottom: 1px solid #ccf;
+}
+
+ul {
+	margin-bottom: 1rem;
+}
+
+h2, h3, h4, h5, h6 {
+	font-weight: normal;
+}
+
+body.front h1 {
+	font-weight: normal;
+	font-size: 300%;
+	color: #4caf50;
+
+	text-align: center;
+}
+
+footer {
+	margin-top: 5rem;
+	text-align: center;
+	font-size: 0.65rem;
+	color: #aaa;
+}
+
+section.features {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	
+	margin: 1rem 0;
+}
+
+section.features > div {
+	box-sizing: border-box;
+	
+	flex-basis: 20rem;
+	flex-grow: 1;
+	
+	color: #171e42;
+	margin: 1rem;
+	padding: 1rem;
+	
+	padding-left: 3rem;
+	
+	position: relative;
+}
+
+section.features > div i {
+	position: absolute;
+	left: 0rem;
+	
+	font-size: 1.5rem;
+	text-align: center;
+	
+	width: 3rem;
+	color: #fafafa;
+	text-shadow: 0px 0px 1px #000;
+}
+
+section.features div > * {
+	margin: 0;
+	maring-bottom: 1rem;
+	font-size: 80%;
+}
+
+section.features h2 {
+	margin: 0;
+	font-size: 90%;
+	padding: 0;
+}
+
+a.register.button {
+	font-size: 120%;
+	
+	background-color: #d8e6db;
+	border-radius: 1rem;
+	padding: 1rem;
+	
+	text-decoration: none;
+	
+	display: inline-block; /* Ensures the element respects padding and margin */
+	margin: 0.5rem; /* Adds space around the button */
+	box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+	text-align: center; /* Centers the text inside the button */
+	white-space: nowrap; /* Prevents the text from wrapping */
+}
+
+dl {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 1rem;
+}
+
+dt {
+	width: 25%;
+	text-align: right;
+	font-weight: bold;
+	margin-top: 1rem;
+}
+
+dd {
+	margin-top: 1rem;
+	margin-left: auto;
+	width: 66%;
+}
+
+.game .board {
+	margin: auto;
+}
+
+.game .board {
+	border-collapse: collapse;
+}
+
+.game .board td {
+	text-align: center;
+	vertical-align: middle;
+	
+	width: 4ch;
+	height: 4ch;
+}
+
+.game .message {
+	text-align: center;
+}
