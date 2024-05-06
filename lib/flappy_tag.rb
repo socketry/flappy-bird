@@ -164,18 +164,18 @@ class FlappyTag < Live::View
 	def handle(event)
 		case event[:type]
 		when "keypress"
-			details = event[:details]
+			detail = event[:detail]
 			
 			if @game.nil?
 				start_game!
-			elsif details[:key] == " "
+			elsif detail[:key] == " "
 				@bird&.jump
 			end
 		end
 	end
 	
 	def forward_keypress
-		"live.forward(#{JSON.dump(@id)}, event, {value: event.target.value, key: event.key})"
+		"live.forwardEvent(#{JSON.dump(@id)}, event, {value: event.target.value, key: event.key})"
 	end
 	
 	def reset!
@@ -194,7 +194,9 @@ class FlappyTag < Live::View
 		
 		@prompt = "Game Over! Score: #{@score}. Press Space to Restart"
 		@game = nil
-		replace!
+		
+		self.update!
+		
 		raise Async::Stop
 	end
 	
@@ -235,7 +237,7 @@ class FlappyTag < Live::View
 			while true
 				self.step(dt)
 				
-				replace!
+				self.update!
 				sleep(dt)
 			end
 		end

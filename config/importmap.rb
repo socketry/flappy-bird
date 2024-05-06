@@ -7,5 +7,5 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
 
 pin "morphdom" # @2.7.2
-pin "@socketry/live", to: "https://ga.jspm.io/npm:@socketry/live@0.6.0/Live.js"
+pin "@socketry/live", to: "@socketry--live.js" # @0.11.0
 pin "live"

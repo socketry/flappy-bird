@@ -1,0 +1,5 @@
+<h1>Flappy</h1>
+#{javascript_import_module_tag "live"}
+#{stylesheet_link_tag "flappy"}
+
+#{@tag.to_html}
