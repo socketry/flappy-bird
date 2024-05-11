@@ -231,8 +231,6 @@ class FlappyTag < Live::View
 	end
 	
 	def run!(dt = 1.0/20.0)
-		Console.info(self, "run!")
-		
 		Async do
 			while true
 				self.step(dt)
