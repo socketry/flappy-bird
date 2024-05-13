@@ -4,7 +4,7 @@ class GameController < ApplicationController
   RESOLVER = Live::Resolver.allow(FlappyView)
 
   def index
-    @tag = FlappyView.new
+    @view = FlappyView.new
   end
 
   skip_before_action :verify_authenticity_token, only: :live
