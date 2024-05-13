@@ -13,11 +13,9 @@ gem "sqlite3", "~> 1.4"
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem "falcon", ">= 0.47"
-
-gem "xrb-rails"
 gem "console-adapter-rails", "~> 0.3"
-gem "async-websocket", "~> 0.26"
 gem "live", "~> 0.8"
+gem "xrb-rails"
 
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"

@@ -230,15 +230,26 @@ class FlappyTag < Live::View
 		end
 	end
 	
-	def run!(dt = 1.0/20.0)
+	def run!(dt = 1.0/60.0)
 		Async do
 			while true
+				start_time = Async::Clock.now
 				self.step(dt)
-				
 				self.update!
-				sleep(dt)
+				
+				duration = Async::Clock.now - start_time
+				sleep(dt - duration) if duration < dt
 			end
 		end
+	end
+	
+	def close
+		if @game
+			@game.stop
+			@game = nil
+		end
+		
+		super
 	end
 	
 	def render(builder)

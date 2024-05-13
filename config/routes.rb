@@ -7,8 +7,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "game#index"
-  
-  # Flappy Example:
-  get "game/play"
-  match "game/live", via: [:get, :connect]
+
+  # The websocket route for the game:
+  match "live", to: "game#live", via: [:get, :connect]
 end

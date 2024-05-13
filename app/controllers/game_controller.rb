@@ -4,10 +4,7 @@ class GameController < ApplicationController
   RESOLVER = Live::Resolver.allow(FlappyTag)
 
   def index
-  end
-
-  def play
-    @tag = FlappyTag.new('flappy')
+    @tag = FlappyTag.new
   end
 
   skip_before_action :verify_authenticity_token, only: :live
