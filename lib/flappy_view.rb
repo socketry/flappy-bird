@@ -5,7 +5,7 @@
 
 require 'live'
 
-class FlappyTag < Live::View
+class FlappyView < Live::View
 	WIDTH = 420
 	HEIGHT = 640
 	GRAVITY = -9.8 * 50.0

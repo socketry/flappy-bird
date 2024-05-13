@@ -1,10 +1,10 @@
 require 'async/websocket/adapters/rails'
 
 class GameController < ApplicationController
-  RESOLVER = Live::Resolver.allow(FlappyTag)
+  RESOLVER = Live::Resolver.allow(FlappyView)
 
   def index
-    @tag = FlappyTag.new
+    @tag = FlappyView.new
   end
 
   skip_before_action :verify_authenticity_token, only: :live
