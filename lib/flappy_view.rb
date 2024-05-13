@@ -129,16 +129,16 @@ class FlappyView < Live::View
 			(@y - @offset) - @height
 		end
 		
-		def lower_bounding_box
-			BoundingBox.new(@x, self.bottom, @width, @height)
-		end
-		
 		def upper_bounding_box
 			BoundingBox.new(@x, self.top, @width, @height)
 		end
 		
+		def lower_bounding_box
+			BoundingBox.new(@x, self.bottom, @width, @height)
+		end
+		
 		def intersect?(other)
-			lower_bounding_box.intersect?(other) || upper_bounding_box.intersect?(other)
+			upper_bounding_box.intersect?(other) || lower_bounding_box.intersect?(other)
 		end
 		
 		def render(builder)
