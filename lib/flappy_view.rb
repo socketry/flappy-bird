@@ -163,19 +163,19 @@ class FlappyView < Live::View
 	
 	def handle(event)
 		case event[:type]
-		when "keypress"
+		when "keypress", "touchstart"
 			detail = event[:detail]
 			
 			if @game.nil?
 				start_game!
-			elsif detail[:key] == " "
+			elsif detail[:key] == " " || detail[:touch]
 				@bird&.jump
 			end
 		end
 	end
 	
 	def forward_keypress
-		"live.forwardEvent(#{JSON.dump(@id)}, event, {value: event.target.value, key: event.key})"
+		"live.forwardEvent(#{JSON.dump(@id)}, event, {value: event.target.value, key: event.key, touch: (event.type === 'touchstart')})"
 	end
 	
 	def reset!
@@ -253,7 +253,7 @@ class FlappyView < Live::View
 	end
 	
 	def render(builder)
-		builder.tag(:div, class: "flappy", tabIndex: 0, onKeyPress: forward_keypress) do
+		builder.tag(:div, class: "flappy", tabIndex: 0, onKeyPress: forward_keypress, onTouchStart: forward_keypress) do
 			if @game
 				builder.inline_tag(:div, class: "score") do
 					builder.text(@score)
