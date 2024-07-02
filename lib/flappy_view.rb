@@ -230,7 +230,7 @@ class FlappyView < Live::View
 		end
 	end
 	
-	def run!(dt = 1.0/60.0)
+	def run!(dt = 1.0/20.0)
 		Async do
 			while true
 				start_time = Async::Clock.now

@@ -1,24 +1,14 @@
-# README
+# Flappy Bird on Rails
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a simple Flappy Bird clone written in Ruby on Rails. It uses Falcon and Live to implement real-time interactivity.
 
-Things you may want to cover:
+## Usage
 
-* Ruby version
+To run the game, clone the repository and run the following commands:
 
-* System dependencies
+```bash
+$ bundle install
+$ bundle exec rails server
+```
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Then, open your browser and navigate to `http://localhost:3000`.
