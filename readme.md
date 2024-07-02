@@ -2,6 +2,8 @@
 
 This is a simple Flappy Bird clone written in Ruby on Rails. It uses Falcon and Live to implement real-time interactivity.
 
+![Flappy Bird Demo](media/Flappy%20Bird%20Demo.gif)
+
 ## Usage
 
 To run the game, clone the repository and run the following commands:
