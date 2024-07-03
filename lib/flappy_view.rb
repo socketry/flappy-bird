@@ -73,9 +73,23 @@ class FlappyView < Live::View
 			builder.inline_tag(:div, class: 'bird', style: "left: #{@x}px; bottom: #{@y}px; width: #{@width}px; height: #{@height}px; transform: #{rotate};")
 		end
 	end
-	
+
+	class Gemstone < BoundingBox
+		def initialize(x, y, width: 148, height: 116)
+			super(x, y - height / 2, width, height)
+		end
+		
+		def step(dt)
+			@x -= 100 * dt
+		end
+		
+		def render(builder)
+			builder.inline_tag(:div, class: 'gemstone', style: "left: #{@x}px; bottom: #{@y}px; width: #{@width}px; height: #{@height}px;")
+		end
+	end
+
 	class Pipe
-		def initialize(x, y, offset = 100, width: 44, height: 700)
+		def initialize(x, y, offset = 100, random: 0, width: 44, height: 700)
 			@x = x
 			@y = y
 			@offset = offset
@@ -84,21 +98,23 @@ class FlappyView < Live::View
 			@height = height
 			@difficulty = 0.0
 			@scored = false
+			
+			@random = random
 		end
 		
-		attr_accessor :x
-		attr_accessor :y
-		attr_accessor :offset
+		attr :x
+		attr :y
+		attr :offset
 		
 		# Whether the bird has passed through the pipe.
 		attr_accessor :scored
 		
 		def scaled_random
-			rand(-1.0..1.0) * [@difficulty, 1.0].min
+			@random.rand(-1.0..1.0) * [@difficulty, 1.0].min
 		end
 		
 		def reset!
-			@x = WIDTH + (rand * 10)
+			@x = WIDTH + (@random.rand * 10)
 			@y = HEIGHT/2 + (HEIGHT/2 * scaled_random)
 			
 			if @offset > 50
@@ -129,16 +145,16 @@ class FlappyView < Live::View
 			(@y - @offset) - @height
 		end
 		
-		def upper_bounding_box
-			BoundingBox.new(@x, self.top, @width, @height)
-		end
-		
 		def lower_bounding_box
 			BoundingBox.new(@x, self.bottom, @width, @height)
 		end
 		
+		def upper_bounding_box
+			BoundingBox.new(@x, self.top, @width, @height)
+		end
+		
 		def intersect?(other)
-			upper_bounding_box.intersect?(other) || lower_bounding_box.intersect?(other)
+			lower_bounding_box.intersect?(other) || upper_bounding_box.intersect?(other)
 		end
 		
 		def render(builder)
@@ -149,16 +165,36 @@ class FlappyView < Live::View
 		end
 	end
 	
-	def initialize(...)
-		super
+	def initialize(*arguments, **options)
+		super(*arguments, **options)
 		
 		@game = nil
 		@bird = nil
 		@pipes = nil
+		@bonus = nil
 		
 		# Defaults:
 		@score = 0
-		@prompt = "Press Space to Start"
+		@prompt = "Press space or tap to start :)"
+		
+		@random = nil
+	end
+	
+	attr :bird
+	
+	def close
+		if @game
+			@game.stop
+			@game = nil
+		end
+		
+		super
+	end
+	
+	def jump
+		play_sound("quack") if rand > 0.5
+				
+		@bird&.jump
 	end
 	
 	def handle(event)
@@ -167,32 +203,69 @@ class FlappyView < Live::View
 			detail = event[:detail]
 			
 			if @game.nil?
-				start_game!
+				self.start_game!
 			elsif detail[:key] == " " || detail[:touch]
-				@bird&.jump
+				self.jump
 			end
 		end
 	end
 	
 	def forward_keypress
-		"live.forwardEvent(#{JSON.dump(@id)}, event, {value: event.target.value, key: event.key, touch: (event.type === 'touchstart')})"
+		"live.forwardEvent(#{JSON.dump(@id)}, event, {key: event.key})"
 	end
 	
 	def reset!
 		@bird = Bird.new
 		@pipes = [
-			Pipe.new(WIDTH * 1/2, HEIGHT/2),
-			Pipe.new(WIDTH * 2/2, HEIGHT/2)
+			Pipe.new(WIDTH + WIDTH * 1/2, HEIGHT/2, random: @random),
+			Pipe.new(WIDTH + WIDTH * 2/2, HEIGHT/2, random: @random)
 		]
+		@bonus = nil
 		@score = 0
 	end
 	
+	def play_sound(name)
+		self.script(<<~JAVASCRIPT)
+			if (!this.sounds) {
+				this.sounds = {};
+			}
+			
+			if (!this.sounds[#{JSON.dump(name)}]) {
+				this.sounds[#{JSON.dump(name)}] = new Audio('/assets/#{name}.mp3');
+			}
+			
+			this.sounds[#{JSON.dump(name)}].play();
+		JAVASCRIPT
+	end
+	
+	def play_music
+		self.script(<<~JAVASCRIPT)
+			if (!this.music) {
+				this.music = new Audio('/assets/music.mp3');
+				this.music.loop = true;
+				this.music.play();
+			}
+		JAVASCRIPT
+	end
+	
+	def stop_music
+		self.script(<<~JAVASCRIPT)
+			if (this.music) {
+				this.music.pause();
+				this.music = null;
+			}
+		JAVASCRIPT
+	end
+	
 	def game_over!
-		Highscore.connection_pool.with_connection do
-			Highscore.create!(name: "Anonymous", score: @score)
-		end
+		Console.info(self, "Player has died.")
 		
-		@prompt = "Game Over! Score: #{@score}. Press Space to Restart"
+		play_sound("death")
+		stop_music
+		
+		Highscore.create!(name: ENV.fetch("PLAYER", "Anonymous"), score: @score)
+		
+		@prompt = "Game Over! Score: #{@score}. Press space or tap to restart."
 		@game = nil
 		
 		self.update!
@@ -200,13 +273,22 @@ class FlappyView < Live::View
 		raise Async::Stop
 	end
 	
-	def start_game!
+	def preparing(message)
+		@prompt = message
+		self.update!
+	end
+	
+	def start_game!(seed = 1)
 		if @game
 			@game.stop
 			@game = nil
 		end
 		
+		@random = Random.new(seed)
+		
 		self.reset!
+		self.update!
+		self.script("this.querySelector('.flappy').focus()")
 		@game = self.run!
 	end
 	
@@ -218,6 +300,10 @@ class FlappyView < Live::View
 			if pipe.right < @bird.x && !pipe.scored
 				@score += 1
 				pipe.scored = true
+				
+				if @score == 3
+					play_music
+				end
 			end
 			
 			if pipe.intersect?(@bird)
@@ -225,31 +311,44 @@ class FlappyView < Live::View
 			end
 		end
 		
+		@bonus&.step(dt)
+		
+		if @bonus&.intersect?(@bird)
+			play_sound("clink")
+			@score = @score * 2
+			@bonus = nil
+		elsif @bonus and @bonus.right < 0
+			@bonus = nil
+		end
+		
+		if @score > 0 and (@score % 5).zero?
+			@bonus = Gemstone.new(WIDTH, HEIGHT/2)
+		end
+		
 		if @bird.top < 0
 			return game_over!
 		end
 	end
 	
-	def run!(dt = 1.0/20.0)
+	# If you change the delta time, you should also update the transform in the CSS so that the game runs at the correct speed.
+	def run!(dt = 1.0/30.0)
 		Async do
+			start_time = Async::Clock.now
+			
 			while true
-				start_time = Async::Clock.now
 				self.step(dt)
+				
 				self.update!
 				
 				duration = Async::Clock.now - start_time
-				sleep(dt - duration) if duration < dt
+				if duration < dt
+					sleep(dt - duration)
+				else
+					Console.info(self, "Running behind by #{duration - dt} seconds")
+				end
+				start_time = Async::Clock.now
 			end
 		end
-	end
-	
-	def close
-		if @game
-			@game.stop
-			@game = nil
-		end
-		
-		super
 	end
 	
 	def render(builder)
@@ -263,11 +362,9 @@ class FlappyView < Live::View
 					builder.text(@prompt)
 					
 					builder.inline_tag(:ol, class: "highscores") do
-						Highscore.connection_pool.with_connection do
-							Highscore.order(score: :desc).limit(10).each do |highscore|
-								builder.inline_tag(:li) do
-									builder.text("#{highscore.name}: #{highscore.score}")
-								end
+						Highscore.top10.each do |highscore|
+							builder.inline_tag(:li) do
+								builder.text("#{highscore.name}: #{highscore.score}")
 							end
 						end
 					end
@@ -279,6 +376,8 @@ class FlappyView < Live::View
 			@pipes&.each do |pipe|
 				pipe.render(builder)
 			end
+			
+			@bonus&.render(builder)
 		end
 	end
 end

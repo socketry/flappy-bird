@@ -6,10 +6,13 @@ body {
 	align-items: center;
 	height: 100vh;
 	margin: 0;
+	
+	overflow: hidden;
 }
 
 .flappy {
 	background-image: url('/assets/flappy-background.png');
+	
 	width: 420px;
 	height: 640px;
 	margin: auto;
@@ -17,7 +20,7 @@ body {
 	position: relative;
 	overflow: hidden;
 	
-	transform: translate3d(0, 0, 0);
+	transform: translate3d(0,0,0);
 }
 
 .flappy .score {
@@ -53,8 +56,8 @@ body {
 	position: absolute;
 	background-size: contain;
 	
-	transition: all 0.05s linear 0s;
-	transform: translate3d(0, 0, 0);
+	transform: translate3d(0,0,0);
+	transition: all 0.033s linear 0s;
 }
 
 .flappy .pipe {
@@ -63,6 +66,16 @@ body {
 	position: absolute;
 	background-size: contain;
 	
-	transition: all 0.05s linear 0s;
-	transform: translate3d(0, 0, 0);
+	transform: translate3d(0,0,0);
+	transition: all 0.033s linear 0s;
+}
+
+.flappy .gemstone {
+	z-index: 0;
+	background-image: url('/assets/gemstone.gif');
+	position: absolute;
+	background-size: contain;
+	
+	transform: translate3d(0,0,0);
+	transition: all 0.033s linear 0s;
 }
