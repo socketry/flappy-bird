@@ -17,6 +17,7 @@ gem "falcon", "~> 0.47"
 gem "console-adapter-rails", "~> 0.3"
 gem "live", "~> 0.12"
 gem "xrb-rails"
+gem "io-watch"
 
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"

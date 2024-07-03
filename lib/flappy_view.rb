@@ -75,8 +75,8 @@ class FlappyView < Live::View
 	end
 
 	class Gemstone < BoundingBox
-		def initialize(x, y, width: 148, height: 116)
-			super(x, y - height / 2, width, height)
+		def initialize(x, y, width: 148/2, height: 116/2)
+			super(x - width/2, y - height/2, width, height)
 		end
 		
 		def step(dt)
@@ -130,6 +130,8 @@ class FlappyView < Live::View
 			
 			if self.right < 0
 				reset!
+				
+				yield if block_given?
 			end
 		end
 		
@@ -143,6 +145,10 @@ class FlappyView < Live::View
 		
 		def bottom
 			(@y - @offset) - @height
+		end
+		
+		def center
+			[@x + @width/2, @y]
 		end
 		
 		def lower_bounding_box
@@ -175,6 +181,7 @@ class FlappyView < Live::View
 		
 		# Defaults:
 		@score = 0
+		@count = 0
 		@prompt = "Press space or tap to start :)"
 		
 		@random = nil
@@ -222,6 +229,7 @@ class FlappyView < Live::View
 		]
 		@bonus = nil
 		@score = 0
+		@count = 0
 	end
 	
 	def play_sound(name)
@@ -295,13 +303,21 @@ class FlappyView < Live::View
 	def step(dt)
 		@bird.step(dt)
 		@pipes.each do |pipe|
-			pipe.step(dt)
+			pipe.step(dt) do
+				# Pipe was reset:
+				
+				if @count > 0 and (@count % 5).zero? and @bonus.nil?
+					@bonus = Gemstone.new(*pipe.center)
+				end
+			end
 			
 			if pipe.right < @bird.x && !pipe.scored
 				@score += 1
+				@count += 1
+				
 				pipe.scored = true
 				
-				if @score == 3
+				if @count == 3
 					play_music
 				end
 			end
@@ -319,10 +335,6 @@ class FlappyView < Live::View
 			@bonus = nil
 		elsif @bonus and @bonus.right < 0
 			@bonus = nil
-		end
-		
-		if @score > 0 and (@score % 5).zero?
-			@bonus = Gemstone.new(WIDTH, HEIGHT/2)
 		end
 		
 		if @bird.top < 0
@@ -355,7 +367,7 @@ class FlappyView < Live::View
 		builder.tag(:div, class: "flappy", tabIndex: 0, onKeyPress: forward_keypress, onTouchStart: forward_keypress) do
 			if @game
 				builder.inline_tag(:div, class: "score") do
-					builder.text(@score)
+					builder.text("Score: #{@score}")
 				end
 			else
 				builder.inline_tag(:div, class: "prompt") do

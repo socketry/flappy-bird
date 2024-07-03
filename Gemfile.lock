@@ -157,6 +157,7 @@ GEM
     io-endpoint (0.11.0)
     io-event (1.6.5)
     io-stream (0.4.0)
+    io-watch (0.5.0)
     irb (1.13.2)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
@@ -323,6 +324,7 @@ DEPENDENCIES
   debug
   falcon (~> 0.47)
   importmap-rails
+  io-watch
   jbuilder
   live (~> 0.12)
   rails (>= 7.2.0.beta2)
