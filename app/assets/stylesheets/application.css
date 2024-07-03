@@ -79,3 +79,26 @@ body {
 	transform: translate3d(0,0,0);
 	transition: all 0.033s linear 0s;
 }
+
+.particle.bonus {
+	--rotation-angle: 0deg;
+	position: absolute;
+	width: 5px;
+	height: 5px;
+	background: #fff;
+	border-radius: 50%;
+	animation: move 2.0s;
+	opacity: 0;
+	transform: rotate(var(--rotation-angle));
+}
+
+@keyframes move {
+	0% {
+			transform: translate(0, 0);
+			opacity: 1;
+	}
+	100% {
+			transform: rotate(var(--rotation-angle)) translate(100px, 100px);
+			opacity: 0;
+	}
+}

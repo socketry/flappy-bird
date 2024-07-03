@@ -32,6 +32,10 @@ class FlappyView < Live::View
 			@y + @height
 		end
 		
+		def center
+			[@x + @width/2, @y + @height/2]
+		end
+		
 		def intersect?(other)
 			!(
 				self.right < other.x ||
@@ -75,16 +79,52 @@ class FlappyView < Live::View
 	end
 
 	class Gemstone < BoundingBox
+		COLLECT_AGE = 1.0
+		
 		def initialize(x, y, width: 148/2, height: 116/2)
 			super(x - width/2, y - height/2, width, height)
+			
+			@collected = false
+			@age = 0.0
+		end
+		
+		def collected?
+			@collected
 		end
 		
 		def step(dt)
 			@x -= 100 * dt
+			
+			if @collected
+				@age += dt
+				
+				yield if @age > COLLECT_AGE
+			end
+		end
+		
+		def collect!
+			@collected = true
 		end
 		
 		def render(builder)
-			builder.inline_tag(:div, class: 'gemstone', style: "left: #{@x}px; bottom: #{@y}px; width: #{@width}px; height: #{@height}px;")
+			if @collected
+				opacity = 1.0 - (@age / COLLECT_AGE)
+			else
+				opacity = 1.0
+			end
+			
+			builder.inline_tag(:div, class: 'gemstone', style: "left: #{@x}px; bottom: #{@y}px; width: #{@width}px; height: #{@height}px; opacity: #{opacity};")
+			
+			# Add some particles:
+			if @collected
+				center = self.center
+				
+				10.times do |i|
+					angle = (360 / 10) * i
+					
+					builder.inline_tag(:div, class: 'particle bonus', style: "left: #{center[0]}px; bottom: #{center[1]}px; --rotation-angle: #{angle}deg;")
+				end
+			end
 		end
 	end
 
@@ -306,7 +346,7 @@ class FlappyView < Live::View
 			pipe.step(dt) do
 				# Pipe was reset:
 				
-				if @count > 0 and (@count % 5).zero? and @bonus.nil?
+				if @bonus.nil? and @count > 0 and (@count % 5).zero?
 					@bonus = Gemstone.new(*pipe.center)
 				end
 			end
@@ -327,12 +367,14 @@ class FlappyView < Live::View
 			end
 		end
 		
-		@bonus&.step(dt)
+		@bonus&.step(dt) do
+			@bonus = nil
+		end
 		
-		if @bonus&.intersect?(@bird)
+		if @bonus&.intersect?(@bird) and !@bonus.collected?
 			play_sound("clink")
 			@score = @score * 2
-			@bonus = nil
+			@bonus.collect!
 		elsif @bonus and @bonus.right < 0
 			@bonus = nil
 		end
