@@ -43,7 +43,7 @@ end
 
 The `index` action instantiates the game view `FlappyView` which is then rendered by the view template [app/views/game/index.html.xrb](app/views/game/index.html.xrb). The `live` action is used to accept a WebSocket connection from the client browser.
 
-When the client connects to the server, it binds the `<div data-class="FlappyView" ...` tag to a server side instance. User interactions generate events which are sent to the server, and the server can send HTML to the client to update the view. In addition, for things like sound effects, the server can send JavaScript to the client to execute.
+When the client connects to the server, it binds the `<div class="live" data-class="FlappyView" id="...">` tag to a server side instance. User interactions generate events which are sent to the server, and the server can send HTML to the client to update the view. In addition, for things like sound effects, the server can send JavaScript to the client to execute.
 
 The actual implementation of the game logic consists of a main game loop which updates the game physics at 30 FPS (frames per second), and then renders the update to the client browser. As the client browser may be running at something other than 30 FPS, we use CSS transforms with linear interpolation to smooth out the changes in position.
 
