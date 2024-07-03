@@ -51,6 +51,10 @@ The actual implementation of the game logic consists of a main game loop which u
 
 Surprisingly, this game can run on any Rack 3 compatible server, including both Puma and Falcon. Rack 3 requires support for streaming requests and responses, which is sufficient to support WebSockets. The difference then, between servers, is how they choose to expose concurrency to the application. In the case of Puma, it is one thread per request, while Falcon uses one fiber per request.
 
+## Presentation
+
+This project was part of my RubyKaigi 2024 Keynote. The <a href="https://github.com/ioquatix/presentations/tree/main/2024">slides are available here</a>.
+
 ## See Also
 
 - [Async](https://github.com/socketry/async) - The Async library for Ruby, which provides a foundation for scalable concurrency.
