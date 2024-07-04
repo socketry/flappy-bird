@@ -54,6 +54,7 @@ class FlappyView < Live::View
 		def initialize(x = 30, y = HEIGHT / 2, width: 34, height: 24)
 			super(x, y, width, height)
 			@velocity = 0.0
+			@jumping = false
 		end
 		
 		def step(dt)
@@ -64,10 +65,21 @@ class FlappyView < Live::View
 				@y = HEIGHT
 				@velocity = 0.0
 			end
+			
+			if @jumping
+				@jumping -= dt
+				if @jumping < 0
+					@jumping = false
+				end
+			end
 		end
 		
-		def jump
+		def jump(extreme = false)
 			@velocity = 300.0
+			
+			if extreme
+				@jumping = 0.5
+			end
 		end
 		
 		def render(builder)
@@ -75,40 +87,53 @@ class FlappyView < Live::View
 			rotate = "rotate(#{-rotation}deg)";
 			
 			builder.inline_tag(:div, class: 'bird', style: "left: #{@x}px; bottom: #{@y}px; width: #{@width}px; height: #{@height}px; transform: #{rotate};")
+			
+			if @jumping
+				center = self.center
+				
+				10.times do |i|
+					angle = (360 / 10) * i
+					id = "bird-#{self.__id__}-particle-#{i}"
+					
+					builder.inline_tag(:div, id: id, class: 'particle jump', style: "left: #{center[0]}px; bottom: #{center[1]}px; --rotation-angle: #{angle}deg;")
+				end
+			end
 		end
 	end
 
 	class Gemstone < BoundingBox
-		COLLECT_AGE = 1.0
+		COLLECTED_AGE = 1.0
 		
 		def initialize(x, y, width: 148/2, height: 116/2)
 			super(x - width/2, y - height/2, width, height)
 			
 			@collected = false
-			@age = 0.0
 		end
 		
 		def collected?
-			@collected
+			@collected != false
 		end
 		
 		def step(dt)
 			@x -= 100 * dt
 			
 			if @collected
-				@age += dt
+				@collected -= dt
 				
-				yield if @age > COLLECT_AGE
+				if @collected < 0
+					@collected = false
+					yield if block_given?
+				end
 			end
 		end
 		
 		def collect!
-			@collected = true
+			@collected = COLLECTED_AGE
 		end
 		
 		def render(builder)
 			if @collected
-				opacity = 1.0 - (@age / COLLECT_AGE)
+				opacity = @collected / COLLECTED_AGE
 			else
 				opacity = 1.0
 			end
@@ -121,8 +146,9 @@ class FlappyView < Live::View
 				
 				10.times do |i|
 					angle = (360 / 10) * i
+					id = "gemstone-#{self.__id__}-particle-#{i}"
 					
-					builder.inline_tag(:div, class: 'particle bonus', style: "left: #{center[0]}px; bottom: #{center[1]}px; --rotation-angle: #{angle}deg;")
+					builder.inline_tag(:div, id: id, class: 'particle bonus', style: "left: #{center[0]}px; bottom: #{center[1]}px; --rotation-angle: #{angle}deg;")
 				end
 			end
 		end
@@ -239,9 +265,11 @@ class FlappyView < Live::View
 	end
 	
 	def jump
-		play_sound("quack") if rand > 0.5
-				
-		@bird&.jump
+		if (extreme = rand > 0.5)
+			play_sound("quack")
+		end
+		
+		@bird&.jump(extreme)
 	end
 	
 	def handle(event)
@@ -371,12 +399,14 @@ class FlappyView < Live::View
 			@bonus = nil
 		end
 		
-		if @bonus&.intersect?(@bird) and !@bonus.collected?
-			play_sound("clink")
-			@score = @score * 2
-			@bonus.collect!
-		elsif @bonus and @bonus.right < 0
-			@bonus = nil
+		if @bonus
+			if !@bonus.collected? and @bonus.intersect?(@bird)
+				play_sound("clink")
+				@score = @score * 2
+				@bonus.collect!
+			elsif @bonus.right < 0
+				@bonus = nil
+			end
 		end
 		
 		if @bird.top < 0

@@ -80,25 +80,60 @@ body {
 	transition: all 0.033s linear 0s;
 }
 
+@keyframes particle-bonus {
+	0% {
+		transform: rotate(var(--rotation-angle)) translate(0, 0);
+		opacity: 1;
+	}
+	25% {
+		transform: rotate(var(--rotation-angle)) translate(25px, -25px);
+		opacity: 0.75;
+	}
+	50% {
+		transform: rotate(var(--rotation-angle)) translate(50px, 50px);
+		opacity: 0.5;
+	}
+	75% {
+		transform: rotate(var(--rotation-angle)) translate(75px, -75px);
+		opacity: 0.25;
+	}
+	100% {
+		transform: rotate(var(--rotation-angle)) translate(100px, 100px);
+		opacity: 0;
+	}
+}
+
 .particle.bonus {
 	--rotation-angle: 0deg;
 	position: absolute;
-	width: 5px;
-	height: 5px;
-	background: #fff;
+	width: 10px;
+	height: 10px;
+	background: #ff0000;
 	border-radius: 50%;
-	animation: move 2.0s;
+	animation: particle-bonus 1.0s cubic-bezier(0.19, 1, 0.22, 1);
 	opacity: 0;
 	transform: rotate(var(--rotation-angle));
 }
 
-@keyframes move {
+@keyframes particle-jump {
 	0% {
-			transform: translate(0, 0);
+			transform: rotate(var(--rotation-angle)) translate(0, 0);
 			opacity: 1;
 	}
 	100% {
 			transform: rotate(var(--rotation-angle)) translate(100px, 100px);
 			opacity: 0;
 	}
+}
+
+.particle.jump {
+	--rotation-angle: 0deg;
+	position: absolute;
+	width: 5px;
+	height: 5px;
+	background: #ffee00;
+	border-radius: 50%;
+	animation: particle-jump 0.5s;
+	opacity: 0;
+	transform: rotate(var(--rotation-angle));
 }
