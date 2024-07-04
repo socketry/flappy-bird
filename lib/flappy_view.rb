@@ -55,6 +55,11 @@ class FlappyView < Live::View
 			super(x, y, width, height)
 			@velocity = 0.0
 			@jumping = false
+			@dying = false
+		end
+		
+		def dying?
+			@dying != false
 		end
 		
 		def step(dt)
@@ -72,9 +77,15 @@ class FlappyView < Live::View
 					@jumping = false
 				end
 			end
+			
+			if @dying
+				@dying += dt
+			end
 		end
 		
 		def jump(extreme = false)
+			return if @dying
+			
 			@velocity = 300.0
 			
 			if extreme
@@ -82,8 +93,17 @@ class FlappyView < Live::View
 			end
 		end
 		
+		def die
+			@dying = 0.0
+		end
+		
 		def render(builder)
-			rotation = (@velocity / 20.0).clamp(-40.0, 40.0)
+			if @dying
+				rotation = 360.0 * (@dying * 2.0)
+			else
+				rotation = (@velocity / 20.0).clamp(-40.0, 40.0)
+			end
+			
 			rotate = "rotate(#{-rotation}deg)";
 			
 			builder.inline_tag(:div, class: 'bird', style: "left: #{@x}px; bottom: #{@y}px; width: #{@width}px; height: #{@height}px; transform: #{rotate};")
@@ -334,11 +354,6 @@ class FlappyView < Live::View
 	end
 	
 	def game_over!
-		Console.info(self, "Player has died.")
-		
-		play_sound("death")
-		stop_music
-		
 		Highscore.create!(name: ENV.fetch("PLAYER", "Anonymous"), score: @score)
 		
 		@prompt = "Game Over! Score: #{@score}. Press space or tap to restart."
@@ -390,7 +405,14 @@ class FlappyView < Live::View
 				end
 			end
 			
-			if pipe.intersect?(@bird)
+			if !@bird.dying? and pipe.intersect?(@bird)
+				Console.info(self, "Player has died.")
+				@bird.die
+				play_sound("death")
+				stop_music
+			end
+			
+			if @bird.dying? and @bird.y < 0
 				return game_over!
 			end
 		end
