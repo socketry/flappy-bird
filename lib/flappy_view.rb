@@ -230,7 +230,7 @@ class FlappyView < Live::View
 		attr_accessor :scored
 		
 		def scaled_random
-			@random.rand(-1.0..1.0) * [@difficulty, 1.0].min
+			@random.rand(-0.8..0.8) * [@difficulty, 1.0].min
 		end
 		
 		def reset!
@@ -238,10 +238,10 @@ class FlappyView < Live::View
 			@y = HEIGHT/2 + (HEIGHT/2 * scaled_random)
 			
 			if @offset > 50
-				@offset -= (@difficulty * 10)
+				@offset -= @difficulty
 			end
 			
-			@difficulty += 0.1
+			@difficulty += 0.05
 			@scored = false
 		end
 		
