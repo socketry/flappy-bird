@@ -382,11 +382,25 @@ class FlappyView < Live::View
 	
 	def play_music
 		self.script(<<~JAVASCRIPT)
-			if (!this.music) {
-				this.music = new Audio('/assets/music.mp3');
-				this.music.loop = true;
-				this.music.play();
+			if (!this.audioContext) {
+				this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+				fetch('/assets/music.mp3')
+					.then(response => response.arrayBuffer())
+					.then(arrayBuffer => this.audioContext.decodeAudioData(arrayBuffer))
+					.then(audioBuffer => {
+						this.playAudioBuffer(audioBuffer);
+					});
 			}
+
+			this.playAudioBuffer = (audioBuffer) => {
+				const source = this.audioContext.createBufferSource();
+				source.buffer = audioBuffer;
+				source.connect(this.audioContext.destination);
+				source.loop = true;
+				source.loopStart = 32.0 * 60.0 / 80.0;
+				source.loopEnd = 96.0 * 60.0 / 80.0;
+				source.start(0, 0);
+			};
 		JAVASCRIPT
 	end
 	
