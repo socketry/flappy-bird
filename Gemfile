@@ -15,7 +15,7 @@ gem "sqlite3", "~> 1.4"
 gem "falcon", "~> 0.47"
 # gem "puma", "~> 6.4"
 gem "console-adapter-rails", "~> 0.3"
-gem "live", "~> 0.12"
+gem "live", "~> 0.13"
 gem "xrb-rails"
 gem "io-watch"
 

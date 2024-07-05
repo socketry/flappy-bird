@@ -5,6 +5,33 @@
 
 require 'live'
 
+class SkinSelectionView < Live::View
+	SKINS = ['bird', 'gull', 'kiwi', 'owl']
+	
+	def handle(event)
+		skin = event.dig(:detail, :skin) or return
+		
+		@data[:skin] = skin
+		
+		self.update!
+	end
+	
+	def skin
+		@data[:skin] || SKINS.first
+	end
+	
+	def render(builder)
+		builder.inline_tag(:ul, class: "skins") do
+			SKINS.each do |skin|
+				selected = (skin == self.skin ? "selected" : "")
+				builder.inline_tag(:li, class: selected, onClick: forward_event(skin: skin)) do
+					builder.inline_tag(:img, src: "/assets/flappy-#{skin}.webp", alt: skin)
+				end
+			end
+		end
+	end
+end
+
 class FlappyView < Live::View
 	WIDTH = 420
 	HEIGHT = 640
@@ -51,15 +78,22 @@ class FlappyView < Live::View
 	end
 	
 	class Bird < BoundingBox
-		def initialize(x = 30, y = HEIGHT / 2, width: 34, height: 24)
+		def initialize(x = 30, y = HEIGHT / 2, width: 34, height: 24, skin: nil)
 			super(x, y, width, height)
+			@skin = skin
 			@velocity = 0.0
 			@jumping = false
 			@dying = false
 		end
 		
+		attr :skin
+		
 		def dying?
 			@dying != false
+		end
+		
+		def alive?
+			@dying == false
 		end
 		
 		def step(dt)
@@ -106,7 +140,7 @@ class FlappyView < Live::View
 			
 			rotate = "rotate(#{-rotation}deg)";
 			
-			builder.inline_tag(:div, class: 'bird', style: "left: #{@x}px; bottom: #{@y}px; width: #{@width}px; height: #{@height}px; transform: #{rotate};")
+			builder.inline_tag(:div, class: "bird #{@skin}", style: "left: #{@x}px; bottom: #{@y}px; width: #{@width}px; height: #{@height}px; transform: #{rotate};")
 			
 			if @jumping
 				center = self.center
@@ -257,17 +291,20 @@ class FlappyView < Live::View
 		end
 	end
 	
-	def initialize(*arguments, **options)
-		super(*arguments, **options)
+	def initialize(...)
+		super(...)
 		
 		@game = nil
 		@bird = nil
 		@pipes = nil
 		@bonus = nil
 		
+		@skin_selection = SkinSelectionView.mount(self, 'skin-selection')
+		
 		# Defaults:
 		@score = 0
 		@count = 0
+		@scroll = 0
 		@prompt = "Press space or tap to start :)"
 		
 		@random = nil
@@ -275,28 +312,36 @@ class FlappyView < Live::View
 	
 	attr :bird
 	
+	def bind(page)
+		super
+		
+		page.attach(@skin_selection)
+	end
+	
 	def close
 		if @game
 			@game.stop
 			@game = nil
 		end
 		
+		page.detach(@skin_selection)
+		
 		super
 	end
 	
 	def jump
 		if (extreme = rand > 0.5)
-			play_sound("quack")
+			play_sound(@bird.skin)
 		end
 		
 		@bird&.jump(extreme)
 	end
 	
 	def handle(event)
+		detail = event[:detail]
+		
 		case event[:type]
 		when "keypress", "touchstart"
-			detail = event[:detail]
-			
 			if @game.nil?
 				self.start_game!
 			elsif detail[:key] == " " || detail[:touch]
@@ -310,7 +355,7 @@ class FlappyView < Live::View
 	end
 	
 	def reset!
-		@bird = Bird.new
+		@bird = Bird.new(skin: @skin_selection.skin)
 		@pipes = [
 			Pipe.new(WIDTH + WIDTH * 1/2, HEIGHT/2, random: @random),
 			Pipe.new(WIDTH + WIDTH * 2/2, HEIGHT/2, random: @random)
@@ -318,6 +363,7 @@ class FlappyView < Live::View
 		@bonus = nil
 		@score = 0
 		@count = 0
+		@scroll = 0
 	end
 	
 	def play_sound(name)
@@ -369,7 +415,13 @@ class FlappyView < Live::View
 		self.update!
 	end
 	
-	def start_game!(seed = 1)
+	def self.birdseed(time = Time.now)
+		time.year * 1000 + time.yday
+	end
+	
+	def start_game!(seed = self.class.birdseed)
+		Console.info(self, "Starting game with seed: #{seed}")
+		
 		if @game
 			@game.stop
 			@game = nil
@@ -384,6 +436,8 @@ class FlappyView < Live::View
 	end
 	
 	def step(dt)
+		@scroll += dt
+		
 		@bird.step(dt)
 		@pipes.each do |pipe|
 			pipe.step(dt) do
@@ -394,26 +448,28 @@ class FlappyView < Live::View
 				end
 			end
 			
-			if pipe.right < @bird.x && !pipe.scored
-				@score += 1
-				@count += 1
-				
-				pipe.scored = true
-				
-				if @count == 3
-					play_music
+			if @bird.alive?
+				if pipe.right < @bird.x && !pipe.scored
+					@score += 1
+					@count += 1
+					
+					pipe.scored = true
+					
+					if @count == 3
+						play_music
+					end
 				end
-			end
 			
-			if !@bird.dying? and pipe.intersect?(@bird)
-				Console.info(self, "Player has died.")
-				@bird.die
-				play_sound("death")
-				stop_music
-			end
-			
-			if @bird.dying? and @bird.y < 0
-				return game_over!
+				if pipe.intersect?(@bird)
+					Console.info(self, "Player has died.")
+					@bird.die
+					play_sound("death")
+					stop_music
+				end
+			else
+				if @bird.y < 0
+					return game_over!
+				end
 			end
 		end
 		
@@ -465,7 +521,13 @@ class FlappyView < Live::View
 				end
 			else
 				builder.inline_tag(:div, class: "prompt") do
+					builder.inline_tag(:div, class: "logo")
+					
+					builder << @skin_selection.to_html
+					
 					builder.text(@prompt)
+					
+					# builder.inline_tag(:img, src: "/assets/instructions.png", style: "width: 100%", alt: "Instructions")
 					
 					builder.inline_tag(:ol, class: "highscores") do
 						Highscore.top10.each do |highscore|

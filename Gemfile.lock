@@ -165,7 +165,7 @@ GEM
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
     json (2.7.2)
-    live (0.12.0)
+    live (0.13.0)
       async-websocket (~> 0.27)
       xrb
     localhost (1.3.1)
@@ -326,7 +326,7 @@ DEPENDENCIES
   importmap-rails
   io-watch
   jbuilder
-  live (~> 0.12)
+  live (~> 0.13)
   rails (>= 7.2.0.beta2)
   redis (>= 4.0.1)
   selenium-webdriver
