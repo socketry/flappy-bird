@@ -1,5 +1,17 @@
+@font-face {
+	font-family: 'Pixeloid Sans';
+	src: url('/assets/pixeloid_sans/PixeloidSans.ttf') format('truetype');
+	font-weight: normal;
+}
+
+@font-face {
+	font-family: 'Pixeloid Sans';
+	src: url('/assets/pixeloid_sans/PixeloidSans-Bold.ttf') format('truetype');
+	font-weight: bold;
+	
+}
 body {
-	font: 1rem/1.5 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font: 1rem/1.5 'Pixeloid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	
 	display: flex;
 	justify-content: center;
@@ -12,6 +24,8 @@ body {
 
 .flappy {
 	background-image: url('/assets/flappy-background.png');
+	background-size: auto 100%;
+	image-rendering: pixelated;
 	
 	width: 420px;
 	height: 640px;
@@ -23,12 +37,51 @@ body {
 	transform: translate3d(0,0,0);
 }
 
+.flappy ul.skins {
+	display: block;
+	text-align: center;
+	padding: 0;
+	margin: 0;
+}
+
+.flappy .skins li {
+	display: inline-block;
+	padding: 0.5rem;
+	margin: 0.5rem;
+}
+
+.flappy .skins img {
+	width: 34px;
+	vertical-align: middle;
+}
+
+.flappy .skins li.selected {
+	background-color: rgba(255, 255, 255, 0.5);
+	border-radius: 0.5rem;
+}
+
+.flappy .logo {
+	background-image: url('/assets/logo.webp');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 380px 90px;
+	
+	width: 100%;
+	height: 120px;
+}
+
 .flappy .score {
 	z-index: 10;
 	padding: 1rem;
 	color: white;
-	background-color: rgba(0, 0, 0, 0.5);
+	/* background-color: rgba(0, 0, 0, 0.5); */
 	position: relative;
+	
+	text-shadow: 
+		-1px -1px 0 #000,
+		1px -1px 0 #000,
+		-1px  1px 0 #000,
+		1px  1px 0 #000;
 }
 
 .flappy .highscores {
@@ -39,7 +92,12 @@ body {
 	z-index: 20;
 	padding: 1rem;
 	color: white;
-	background-color: rgba(0, 0, 0, 0.5);
+	/* background-color: rgba(0, 0, 0, 0.5); */
+	text-shadow: 
+		-1px -1px 0 #000,
+		1px -1px 0 #000,
+		-1px  1px 0 #000,
+		1px  1px 0 #000;
 	
 	position: absolute;
 	left: 0;
@@ -52,12 +110,24 @@ body {
 
 .flappy .bird {
 	z-index: 1;
-	background-image: url('/assets/flappy-bird.png');
+	background-image: url('/assets/flappy-bird.webp');
 	position: absolute;
 	background-size: contain;
 	
 	transform: translate3d(0,0,0);
 	transition: all 0.033s linear 0s;
+}
+
+.flappy .bird.gull {
+	background-image: url('/assets/flappy-gull.webp');
+}
+
+.flappy .bird.kiwi {
+	background-image: url('/assets/flappy-kiwi.webp');
+}
+
+.flappy .bird.owl {
+	background-image: url('/assets/flappy-owl.webp');
 }
 
 .flappy .pipe {
@@ -110,9 +180,11 @@ body {
 	height: 10px;
 	background: #ff0000;
 	border-radius: 50%;
-	animation: particle-bonus 1.0s cubic-bezier(0.19, 1, 0.22, 1);
 	opacity: 0;
-	transform: rotate(var(--rotation-angle));
+	
+	transform: rotate(var(--rotation-angle));	
+	animation: particle-bonus 1.0s cubic-bezier(0.19, 1, 0.22, 1);
+	animation-iteration-count: 1;
 }
 
 @keyframes particle-jump {
@@ -133,7 +205,9 @@ body {
 	height: 5px;
 	background: #ffee00;
 	border-radius: 50%;
-	animation: particle-jump 0.5s;
 	opacity: 0;
+	
 	transform: rotate(var(--rotation-angle));
+	animation: particle-jump 0.5s;
+	animation-iteration-count: 1;
 }
