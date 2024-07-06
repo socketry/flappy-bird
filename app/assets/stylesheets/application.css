@@ -183,8 +183,7 @@ body {
 	opacity: 0;
 	
 	transform: rotate(var(--rotation-angle));	
-	animation: particle-bonus 1.0s cubic-bezier(0.19, 1, 0.22, 1);
-	animation-iteration-count: 1;
+	animation: particle-bonus 1.0s;
 }
 
 @keyframes particle-jump {
@@ -209,5 +208,4 @@ body {
 	
 	transform: rotate(var(--rotation-angle));
 	animation: particle-jump 0.5s;
-	animation-iteration-count: 1;
 }
