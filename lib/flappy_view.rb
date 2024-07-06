@@ -330,7 +330,7 @@ class FlappyView < Live::View
 	end
 	
 	def jump
-		if (extreme = rand > 0.5)
+		if (extreme = rand > 0.8)
 			play_sound(@bird.skin)
 		end
 		
