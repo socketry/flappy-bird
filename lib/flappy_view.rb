@@ -480,10 +480,6 @@ class FlappyView < Live::View
 					play_sound("death")
 					stop_music
 				end
-			else
-				if @bird.y < 0
-					return game_over!
-				end
 			end
 		end
 		
@@ -501,7 +497,14 @@ class FlappyView < Live::View
 			end
 		end
 		
-		if @bird.top < 0
+		if @bird.top < -20
+			if @bird.alive?
+				@bird.die
+				play_sound("death")
+			end
+			
+			stop_music
+			
 			return game_over!
 		end
 	end
