@@ -238,10 +238,10 @@ class FlappyView < Live::View
 			@y = HEIGHT/2 + (HEIGHT/2 * scaled_random)
 			
 			if @offset > 50
-				@offset -= @difficulty
+				@offset -= 1
 			end
 			
-			@difficulty += 0.05
+			@difficulty += 0.1
 			@scored = false
 		end
 		
