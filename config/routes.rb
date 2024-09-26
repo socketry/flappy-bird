@@ -9,5 +9,5 @@ Rails.application.routes.draw do
   root "game#index"
 
   # The websocket route for the game:
-  match "live", to: "game#live", via: [:get, :connect]
+  match "index_live", to: "game#index_live", via: [:get, :connect]
 end
