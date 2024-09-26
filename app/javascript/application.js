@@ -3,4 +3,5 @@
 // import "controllers"
 
 import {Live} from "@socketry/live"
-window.live = Live.start()
+
+window.Live = Live

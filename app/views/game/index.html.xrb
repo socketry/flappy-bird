@@ -1,1 +1,7 @@
 #{@view}
+
+<script>
+  var live = window.Live.start({
+    path: "index_live",
+  })
+</script>
